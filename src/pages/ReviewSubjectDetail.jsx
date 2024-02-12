@@ -1,9 +1,7 @@
 import React, { useState } from 'react'
 import CardDetailSubject from '../components/cardReview/CardDetailSubject'
 import CardReview from '../components/cardReview/CardReview'
-import QuestionCard from '../components/question/QuestionCard'
 import { Outlet, useLocation, Link, useParams } from 'react-router-dom'
-import QuestionDetail from '../dummyData/QuestionDetail'
 
 function ReviewSubjectDetail() {
   let { reviewId } = useParams();
@@ -18,31 +16,6 @@ function ReviewSubjectDetail() {
   };
   console.log(isModalCreateOpen)
 
-  // แสดงตัวตน ปัจจุบัน
-  const user = "Anonymous1";
-  // import data จาก QuestionDetail
-  const [database, setDatabase] = useState(QuestionDetail);
-
-  // เพิ่มข้อมูลลงฐานข้อมูล
-  const [question, setQuestion] = useState('');
-  const postQuestion = () => {
-    const currentDate = new Date();
-    const newQuestion = {
-      id: database[database.length - 1].id + 1,
-      name: user,
-      date: `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()+543}`,
-      time: currentDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-      detail: question,
-      like: [],
-      dislike: [],
-      answer: []
-    };
-    // เอาข้อมูลเก่า + ข้อมูลใหม่
-    const newDatabase = [...database, newQuestion];
-    // Update the state with the new array
-    setDatabase(newDatabase);
-    setQuestion('')
-  }
 
   return (
     <div className='w-full'>
@@ -59,11 +32,6 @@ function ReviewSubjectDetail() {
               onClick={() => setActiveTab("review")}
               className={`${activeTab === "review" ? "border-[#151C38] text-[#151C38] font-medium text-lg" : "border-[#00000020] text-[#00000020] font-medium text-lg"} border-b-4 px-5`}>
               Review
-            </button>
-            <button
-              onClick={() => setActiveTab("question")}
-              className={`${activeTab === "question" ? "border-[#151C38] text-[#151C38] font-medium text-lg" : "border-[#00000020] text-[#00000020] font-medium text-lg"} border-b-4 px-5`}>
-              Question
             </button>
           </div>
           <div className='h-full' >
@@ -182,28 +150,6 @@ function ReviewSubjectDetail() {
                     </div>
                   )}
                 </div>
-              </div>}
-            {activeTab === "question" &&
-              <div className="w-full mt-4 border-2 rounded-[30px] bg-[#ffffff] p-[20px]">
-                {/* สร้างคำถาม */}
-                <div className='inputReview flex flex-row gap-3 drop-shadow-sm'>
-                  <input type='text' placeholder="Question" className="w-full h-[50px] font-light pr-[80px]"
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}>
-                  </input>
-                  <button
-                    className="py-[6px] px-[12px] rounded-[10px] bg-gradient-to-br 
-                    from-[#0D0B5F] from-[12.5%] to-[#029BE0] to-[100%] text-[#ffffff]  
-                    hover:from-[#029BE0] hover:to-[#0D0B5F]
-                    absolute right-2 top-2 text-[16px]"
-                    onClick={postQuestion}
-                  >
-                    POST
-                  </button>
-                </div>
-
-                {/* QuestionCard */}
-                <QuestionCard database={database} setDatabase={setDatabase} user={user}/>
               </div>}
           </div>
         </div>
