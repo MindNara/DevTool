@@ -1,0 +1,14 @@
+.title .animTitle {
+    animation-name: title;
+    animation-duration: 2s;
+}
+
+@keyframes title {
+    from {
+        transform: translateX(0%);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
