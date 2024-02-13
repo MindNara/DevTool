@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Menu, MenuHandler, MenuItem, MenuList, rating } from "@material-tailwind/react";
 import { ReviewDetail } from "../../dummyData/ReviewDetail";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from '../../config/firebase';
 
 function CardReview({id}) {
     const user = "Anonymous1";
@@ -21,6 +23,23 @@ function CardReview({id}) {
         console.log(arrayRate)
         return <div className="flex flex-row ml-2">{arrayRate}</div>
     }
+
+    const [reviews, setReviews] = useState([]);
+    const getReview = async () => {
+        try {
+            const querySnapshot = await getDocs(query(collection(db, "review"), where("subject_id", "==", id)));
+            console.log("Total review: ", querySnapshot.size);
+            const reviewDoc = [];
+            querySnapshot.forEach((doc) => {
+                reviewDoc.push({ ...doc.data(), key: doc.id });
+            });
+            console.log(reviewDoc);
+            setReviews(reviewDoc);
+        } catch (error) {
+            console.error("Error fetching review:", error);
+        }
+    }
+    getReview();
 
     // const toggleEditOrDelete = (index) => {
     //     setOpenEditOrDelete((prevIndex) => (prevIndex === index ? null : index));
@@ -97,8 +116,8 @@ function CardReview({id}) {
 
     return (
         <div className="mt-4">
-            {ReviewDetail.map((review, index) => (
-                review.subjectId === id && (
+            {reviews.map((review, index) => (
+                review.subject_id === id && (
                     <div className="max-w p-6 bg-white border border-gray-200 rounded-xl mt-4">
                     <div className="mt-2 flex flex-row">
                         <div className="w-[50px] h-[50px] flex-shrink-0 rounded-full bg-[#151C38]"></div>
@@ -306,9 +325,10 @@ function CardReview({id}) {
                         )}
 
                         <div className="ml-4">
-                            <p className="text-[#151C38] text-l font-[400]">{review.name}</p>
+                            <p className="text-[#151C38] text-l font-[400]">Anonymous</p>
                             <p className="text-[#A4A4A4] text-l font-[350]">
-                                {review.date}, {review.time}
+                                {/* {review.time_stamp} */}
+                                13/2/2024, 3.00 PM
                             </p>
                         </div>
                     </div>
@@ -334,7 +354,7 @@ function CardReview({id}) {
 
                     </div>
                     <div className="mt-2">
-                        <p className="text-[#151C38] font-normal">{review.reviewDetails}</p>
+                        <p className="text-[#151C38] font-normal">{review.detail}</p>
                     </div>
                     <div className="flex flex-row mt-2">
                         <img className="w-[28px] h-[28px]" src="https://img.icons8.com/sf-regular-filled/48/cd0404/facebook-like.png" alt="" />
