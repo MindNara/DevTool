@@ -1,9 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import CardSubject from '../components/cardReview/CardSubject'
 import CardAnnouncement from '../components/cardReview/CardAnnouncement';
-import { SubjectDetail } from '../dummyData/SubjectDetail';
+// import { SubjectDetail } from '../dummyData/SubjectDetail';
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from '../config/firebase';
 
 function Review() {
+  const [subject, setSubject] = useState([]);
+  const getSubject = async () => {
+    try {
+      const querySnapshot = await getDocs(query(collection(db, "course"), where("type", "==", "วิชาบังคับ")));
+      console.log("Total subject: ", querySnapshot.size);
+      const subjectDoc = [];
+      querySnapshot.forEach((doc) => {
+        subjectDoc.push({ ...doc.data(), key: doc.id });
+      });
+      console.log(subjectDoc);
+      setSubject(subjectDoc);
+    } catch (error) {
+      console.error("Error fetching course:", error);
+    }
+  }
+  useEffect(() => {
+    getSubject();
+    // const unsubscribe = getSubject();
+    // return unsubscribe;  // จะเรียกเมื่อ component ถูก unmount
+  }, []);
+
   const [textSearch, setTextSearch] = useState('');
   return (
     <>
@@ -33,9 +56,9 @@ function Review() {
               <img width="20" height="20" src='https://img.icons8.com/material-rounded/24/737373/delete-sign.png' className='icon top-3 ml-4'></img>
             </button>
           </div>
-          <CardSubject item={SubjectDetail} />
+          <CardSubject item={subject} />
         </div>
-        
+
         <div className='w-[30%] border-l-[1px] border-[#00000052] pl-5'>
           <h1 className='text-[26px] font-medium'>Announcement</h1>
           <CardAnnouncement />

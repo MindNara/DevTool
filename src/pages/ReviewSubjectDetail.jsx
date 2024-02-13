@@ -27,12 +27,13 @@ function ReviewSubjectDetail() {
       {/* ReviewOrQuestion */}
       <div name="ReviewOrQuestion">
         <div className='h-[48dvh] mt-4'>
-          <div name='btnReviewOrQuestion'>
-            <button
+          <div name='Review'>
+            <p className='text-[#151C38] font-bold text-xl ml-2'>Review (0)</p>
+            {/* <button
               onClick={() => setActiveTab("review")}
               className={`${activeTab === "review" ? "border-[#151C38] text-[#151C38] font-medium text-lg" : "border-[#00000020] text-[#00000020] font-medium text-lg"} border-b-4 px-5`}>
               Review
-            </button>
+            </button> */}
           </div>
           <div className='h-full' >
             {activeTab === "review" &&
