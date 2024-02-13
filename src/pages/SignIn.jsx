@@ -11,22 +11,7 @@ function SignIn() {
     //signin
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { signIn } = UserAuth();
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('')
-        try {
-            await signIn(email, password)
-            navigate('/dashboard')
-        } catch (e) {
-            setError(e.message)
-            console.log(e.message)
-        }
-    };
-    //
 
     return (
         <div style={{ backgroundImage: `url(${SignInBG})` }}
@@ -37,7 +22,7 @@ function SignIn() {
                     <Link to='/'><img src={Logo} alt="Logo" className='w-28' /></Link>
                     <h1 className='font-bold text-[50px] tracking-[2px] mt-4'>LOGIN</h1>
                     <p className='font-light text-[30px] tracking-[2px] mt-4'>Login to continues</p>
-                    <form onSubmit={handleSubmit} className='flex flex-col gap-6 mt-6'>
+                    <form onSubmit={() => { }} className='flex flex-col gap-6 mt-6'>
                         <div className='input-box'>
                             <img width="35" height="35" src='https://img.icons8.com/fluency-systems-regular/48/151c38/new-post.png' className='icon mt-3 ml-6'></img>
                             <input type='email' name='email' placeholder='Email' className='w-[600px] h-[60px] font-light' onChange={(e) => setEmail(e.target.value)}></input>
@@ -57,9 +42,7 @@ function SignIn() {
                         <Link to='/signUp' className='font-normal text-[25px] textSignInGradient underline underline-offset-4 decoration-[#3753cf8f] inline'>Sign Up</Link>
                     </div>
                 </div>
-
             </div>
-
         </div>
     )
 }
