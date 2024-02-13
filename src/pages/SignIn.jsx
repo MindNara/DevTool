@@ -3,15 +3,10 @@ import SignInBG from '../assets/SignInBG.png'
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import Logo from '../assets/Logo.png'
 import SignInImage from '../assets/SignInImage.png'
-import { UserAuth } from '../context/AuthContext';
 import { Button } from '@material-tailwind/react';
 
 
 function SignIn() {
-    const { user } = UserAuth();
-    if (user) {
-        return <Navigate to='/dashboard' />;
-    }
 
     //signin
     const [email, setEmail] = useState('');

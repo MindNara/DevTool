@@ -3,9 +3,8 @@ import SignUpBG from '../assets/SignUpBG.png'
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import Logo from '../assets/Logo.png'
 import SignUpImage from '../assets/SignUpImage.png'
-import { UserAuth } from '../context/AuthContext';
+
 function SignUp() {
-    const { user, createUser } = UserAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

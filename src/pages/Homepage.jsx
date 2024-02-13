@@ -2,7 +2,6 @@ import React from 'react'
 import { Link, useNavigate } from "react-router-dom"
 import HomepageBG from '../assets/HomepageBG.png'
 import Logo from '../assets/Logo.png'
-import { UserAuth } from '../context/AuthContext';
 
 function Homepage() {
     const navigate = useNavigate();

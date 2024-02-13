@@ -3,11 +3,9 @@ import { Link, useNavigate, useLocation } from "react-router-dom"
 import Logo from '../../assets/Logo.png'
 import './SideNavBarStyle.css'
 import { SidebarHowToRegister } from '../../components/index'
-import { UserAuth } from '../../context/AuthContext'
 import { Button } from '@material-tailwind/react'
 
 function SideNavBar({ toggle, isOpen, setIsOpen }) {
-    const { logout } = UserAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -70,7 +68,7 @@ function SideNavBar({ toggle, isOpen, setIsOpen }) {
                                 <div className='bg-white w-12 max-2xl:w-9 h-12 max-2xl:h-9 rounded-[50px]'></div>
                                 <span className='username text-[18px] max-2xl:text-[14px] font-light'>Username</span>
                             </div>
-                            <Button onClick={()=>logout()}>
+                            <Button onClick={() => { }}>
                                 <img className='max-2xl:w-5' width='24' height='24' src="https://img.icons8.com/ios-filled/FFFFFF/logout-rounded.png" alt="logout-rounded" />
                             </Button>
                         </div>
