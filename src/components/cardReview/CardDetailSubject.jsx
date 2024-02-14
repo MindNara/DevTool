@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from '../../config/firebase';
 
@@ -22,21 +22,25 @@ const CardDetailSubject = ({ id }) => {
     //     },
     // ];
     const [subject, setSubject] = useState([]);
-    const getSubject = async () => {
-        try {
-            const querySnapshot = await getDocs(query(collection(db, "course"), where("subject_id", "==", id)));
-            console.log("Total subject: ", querySnapshot.size);
-            const subjectDoc = [];
-            querySnapshot.forEach((doc) => {
-                subjectDoc.push({ ...doc.data(), key: doc.id });
-            });
-            console.log(subjectDoc);
-            setSubject(subjectDoc);
-        } catch (error) {
-            console.error("Error fetching course:", error);
-        }
-    }
-    getSubject();
+    useEffect(() => {
+        const getSubject = async () => {
+            try {
+                const querySnapshot = await getDocs(query(collection(db, "course"), where("subject_id", "==", id)));
+                console.log("Total subject: ", querySnapshot.size);
+                const subjectDoc = [];
+                querySnapshot.forEach((doc) => {
+                    subjectDoc.push({ ...doc.data(), key: doc.id });
+                });
+                console.log(subjectDoc);
+                setSubject(subjectDoc);
+            } catch (error) {
+                console.error("Error fetching course:", error);
+            }
+        };
+    
+        getSubject();
+    }, []); // ต้องใส่ dependency array เป็น [] เพื่อให้ useEffect ทำงานเมื่อ component ถูกโหลดเท่านั้น
+    
 
     return (
         <div>
