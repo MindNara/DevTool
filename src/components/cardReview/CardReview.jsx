@@ -102,7 +102,7 @@ function CardReview({ id }) {
 
     const toggleModalEdit = (review) => {
         // นำค่ามาแสดงผลตอน edit
-        setTextReview(review.reviewDetails)
+        setTextReview(review.detail)
         setRating(review.rating.toString())
         setGrade(review.grade)
         setIsModalEditOpen(!isModalEditOpen);

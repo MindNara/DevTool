@@ -2,12 +2,18 @@ import React, { useState } from 'react'
 import CardDetailSubject from '../components/cardReview/CardDetailSubject'
 import CardReview from '../components/cardReview/CardReview'
 import { Outlet, useLocation, Link, useParams } from 'react-router-dom'
+import { collection, query, where, getDocs,addDoc } from "firebase/firestore";
+import { db } from '../config/firebase';
 
 function ReviewSubjectDetail() {
   let { reviewId } = useParams();
+  const [subjectId, setSubjectId] = useState("");
   console.log(reviewId)
   const [activeTab, setActiveTab] = useState("review")
 
+  const [reviewDetail, setReviewDetail] = useState("");
+  const [reviewGrade, setReviewGrade] = useState("A");
+  const [reviewRating, setReviewRating] = useState("1");
   // Modal create open
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 
@@ -16,6 +22,32 @@ function ReviewSubjectDetail() {
   };
   console.log(isModalCreateOpen)
 
+  // Create Review
+  const createReview = async () => {
+    // const user = firebase_auth.currentUser;
+    // const timestamp = firebase.database.ServerValue.TIMESTAMP;
+    const timestamp = new Date();
+    console.log(timestamp)
+    try {
+      const ReviewRef = await addDoc(collection(db, "review"), {
+        detail: reviewDetail,
+        grade: reviewGrade,
+        rating:reviewRating,
+        subject_id: reviewId,
+        like: [],
+        dislike: [],
+        time_stamp: timestamp,
+        user_id: "ftAatjPLXHMPDnsvw0WQvGzYQpk2"
+      });
+      setIsModalCreateOpen(false)
+      window.location.reload()
+      console.log("Add Review success");
+      console.log("id " + reviewId)
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
 
   return (
     <div className='w-full'>
@@ -52,7 +84,7 @@ function ReviewSubjectDetail() {
                     </button>
                   </div>
                   <CardReview id={reviewId} />
-                  
+
                   {/* Modal create Review */}
                   {isModalCreateOpen && (
                     <div
@@ -99,6 +131,7 @@ function ReviewSubjectDetail() {
                                 cols="50"
                                 placeholder="Text something review ..."
                                 className="border-none outline-none p-2 mb-4 w-full resize-none focus:ring-0 text-base font-normal"
+                                onChange={(e) => setReviewDetail(e.target.value)}
                               // value="eiei"
                               />
                             </div>
@@ -109,7 +142,7 @@ function ReviewSubjectDetail() {
                                 </label>
                                 <select
                                   className='bg-[#F4F4F4] border border-gray-200 rounded-[10px] text-gray-500 mt-2 text-[16px] max-2xl:text-[15px] w-full py-2 px-3 leading-tight focus:outline-none focus:border-gray-500'
-                                  name="selectedPoint">
+                                  name="selectedPoint" value={reviewRating} onChange={(e) => setReviewRating(e.target.value)}>
                                   <option value="1">1 point</option>
                                   <option value="2">2 point</option>
                                   <option value="3">3 point</option>
@@ -124,7 +157,7 @@ function ReviewSubjectDetail() {
                                 </label>
                                 <select
                                   className='bg-[#F4F4F4] border border-gray-200 text-gray-500 rounded-[10px] mt-2 text-[16px] max-2xl:text-[15px] w-full py-2 px-3 leading-tight focus:outline-none focus:border-gray-500'
-                                  name="selectedGrade">
+                                  name="selectedGrade" value={reviewGrade} onChange={(e) => setReviewGrade(e.target.value)}>
                                   <option value="A">A</option>
                                   <option value="B+">B+</option>
                                   <option value="B">B</option>
@@ -138,7 +171,7 @@ function ReviewSubjectDetail() {
                             {/* footer */}
                             <div className="flex items-center p-4 md:p-5 rounded-b mt-[-20px] mb-2">
                               <button
-                                onClick={() => setIsModalCreateOpen(false)}
+                                onClick={createReview}
                                 type="button"
                                 className="text-white bg-gradient-to-br from-[#0D0B5F] to-[#029BE0] hover:from-[#029BE0] hover:to-[#0D0B5F] font-medium rounded-lg text-lg px-10 py-2 text-center w-full"
                               >
