@@ -16,11 +16,27 @@ function ReviewSubjectDetail() {
   const [reviewRating, setReviewRating] = useState("1");
   // Modal create open
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
+  const [subjects, setSubjects] = useState([]);
 
   const toggleModalCreate = () => {
     setIsModalCreateOpen(!isModalCreateOpen);
   };
   console.log(isModalCreateOpen)
+
+
+  // const getSubject = async () => {
+  //   try {
+  //     const querySnapshot = await getDocs(query(collection(db, "course"), where("type", "==", "วิชาบังคับ")));
+  //     const subjectDocs = [];
+  //     querySnapshot.forEach((doc) => {
+  //       subjectDocs.push({ ...doc.data(), id: doc.id });
+  //     });
+  //     console.log(subjectDocs);
+  //     setSubjects(subjectDocs);
+  //   } catch (error) {
+  //     console.error("Error fetching course:", error);
+  //   }
+  // };
 
   // Create Review
   const createReview = async () => {
@@ -40,6 +56,7 @@ function ReviewSubjectDetail() {
         user_id: "ftAatjPLXHMPDnsvw0WQvGzYQpk2"
       });
       setIsModalCreateOpen(false)
+      // getSubject()
       window.location.reload()
       console.log("Add Review success");
       console.log("id " + reviewId)

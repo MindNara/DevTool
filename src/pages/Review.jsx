@@ -50,7 +50,7 @@ function Review() {
   return (
     <>
       <div className='w-full h-auto flex'>
-        <div className='w-[70%] pr-5'>
+        <div className='w-full pr-5'>
           <div className='flex flex-row gap-3'>
             <h1 className='text-[26px] font-medium text-[#151C38]'>รายวิชาเรียน</h1>
             <select className="text-white bg-[#151C38] rounded-lg text-lg px-2" name='selectYear'>
@@ -78,10 +78,7 @@ function Review() {
           <CardSubject item={subjects} />
         </div>
 
-        <div className='w-[30%] border-l-[1px] border-[#00000052] pl-5'>
-          <h1 className='text-[26px] font-medium'>Announcement</h1>
-          <CardAnnouncement />
-        </div>
+      
       </div>
     </>
   )

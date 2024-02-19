@@ -2,11 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Menu, MenuHandler, MenuItem, MenuList, rating } from "@material-tailwind/react";
 import { ReviewDetail } from "../../dummyData/ReviewDetail";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, deleteDoc, updateDoc} from "firebase/firestore";
 import { db } from '../../config/firebase';
 
 function CardReview({ id }) {
     const user = "Anonymous1";
+    
+    const [textReview, setTextReview] = useState('');
+    const [rating, setRating] = useState('');
+    const [grade, setGrade] = useState('');
+
+    const [reviewDoc, setReviewDoc] = useState();
+
 
     // แสดงผลดาวตรง rating
     function DisplayRating(rate) {
@@ -24,6 +31,7 @@ function CardReview({ id }) {
         return <div className="flex flex-row ml-2">{arrayRate}</div>
     }
 
+    // ดึงรีวิวในวิชานัั้นๆมา
     const [reviews, setReviews] = useState([]);
     useEffect(() => {
         const getReview = async () => {
@@ -43,65 +51,47 @@ function CardReview({ id }) {
         getReview();
     }, []); // ต้องใส่ dependency array เป็น [] เพื่อให้ useEffect ทำงานเมื่อ component ถูกโหลดเท่านั้น
 
-    // const toggleEditOrDelete = (index) => {
-    //     setOpenEditOrDelete((prevIndex) => (prevIndex === index ? null : index));
-    // }
-    // const handleToggleLike = (index) => {
-    //     setData(
-    //         (dumyDatabase) => {
-    //             const updatedDatabase = [...dumyDatabase];
-    //             const likeByUser = updatedDatabase[index].like.includes(user);
 
-    //             if (likeByUser) {
-    //                 // ถ้า user กด'like'ในข้อมูลเดิม ให้ลบออก
-    //                 updatedDatabase[index].like = updatedDatabase[index].like.filter(user_id => user_id !== user);
-    //             } else {
-    //                 const dislikeByUser = updatedDatabase[index].dislike.includes(user);
-    //                 if (dislikeByUser) {
-    //                     // ถ้า user กด'dislike'ในข้อมูลเดิม แล้วกด'like' ข้อมูล'dislike'เดิมจะถูกนำออก
-    //                     updatedDatabase[index].dislike = updatedDatabase[index].dislike.filter(user_id => user_id !== user);
-    //                 }
-    //                 // ถ้า user ไม่ได้กด'like'ในข้อมูลเดิม ให้เพิ่มเข้า
-    //                 updatedDatabase[index].like.push(user);
-    //             }
-    //             return updatedDatabase;
-    //         }
-    //     )
-    // }
+    // แก้ไข review
+    const updateReview = async () => {
+        console.log(reviewDoc);
+        const documentRef = doc(db, 'review', reviewDoc);
+        try {
+            await updateDoc(documentRef, {
+                detail: textReview,
+                rating: rating,
+                grade: grade,
+            });
+            console.log("Data updated in Firestore!");
+        } catch (error) {
+            console.error("Error updating data in Firestore: ", error);
+        }
+        setIsModalEditOpen(false)
+        window.location.reload()
+    }
 
-    // const handleToggleDislike = (index) => {
-    //     setData(
-    //         (dumyDatabase) => {
-    //             const updatedDatabase = [...dumyDatabase];
-    //             const dislikeByUser = updatedDatabase[index].dislike.includes(user);
-
-    //             if (dislikeByUser) {
-    //                 // ถ้า user กด'dislike'ในข้อมูลเดิม ให้ลบออก
-    //                 updatedDatabase[index].dislike = updatedDatabase[index].dislike.filter(user_id => user_id !== user);
-    //             } else {
-    //                 const likeByUser = updatedDatabase[index].like.includes(user);
-    //                 if (likeByUser) {
-    //                     // ถ้า user กด'like'ในข้อมูลเดิม แล้วกด'dislike' ข้อมูล'like'เดิมจะถูกนำออก
-    //                     updatedDatabase[index].like = updatedDatabase[index].like.filter(user_id => user_id !== user);
-    //                 }
-    //                 // ถ้า user ไม่ได้กด'dislike'ในข้อมูลเดิม ให้เพิ่มเข้า
-    //                 updatedDatabase[index].dislike.push(user);
-    //             }
-    //             return updatedDatabase;
-    //         }
-    //     )
-    // }
-
-    const [textReview, setTextReview] = useState('');
-    const [rating, setRating] = useState('');
-    const [grade, setGrade] = useState('');
-
+    // ลบ Review
+    const deleteReview = async () => {
+        console.log(reviewDoc);
+        const documentRef = doc(db, 'review', reviewDoc);
+        try {
+            await deleteDoc(documentRef);
+            console.log(`Review deleted successfully.`);
+        } catch (error) {
+            console.error("Error deleting Review:", error);
+        }
+        setReviewDoc("");
+        setIsModalDeleteOpen(false)
+        window.location.reload()
+    }
 
     // Modal edit open
     const [isModalEditOpen, setIsModalEditOpen] = useState(false);
 
     const toggleModalEdit = (review) => {
         // นำค่ามาแสดงผลตอน edit
+        setReviewDoc(review.key)
+        console.log(review.key)
         setTextReview(review.detail)
         setRating(review.rating.toString())
         setGrade(review.grade)
@@ -112,8 +102,10 @@ function CardReview({ id }) {
 
     const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
 
-    const toggleModalDelete = () => {
+    const toggleModalDelete = (ReviewId) => {
         setIsModalDeleteOpen(!isModalDeleteOpen);
+        setReviewDoc(ReviewId);
+        
     };
 
     return (
@@ -142,7 +134,7 @@ function CardReview({ id }) {
                                             <span className="pl-3 text-gray-700">Edit Review</span>
                                         </div>
                                     </MenuItem>
-                                    <MenuItem className="hover:bg-gray-200 cursor-pointer rounded-xl" onClick={toggleModalDelete}>
+                                    <MenuItem className="hover:bg-gray-200 cursor-pointer rounded-xl" onClick={() => toggleModalDelete(review.key)}>
                                         <div className="hover:bg-gray-200 cursor-pointer">
                                             <div className="flex item-center py-3">
                                                 <Icon
@@ -215,7 +207,7 @@ function CardReview({ id }) {
                                                         </label>
                                                         <select
                                                             className='bg-[#F4F4F4] border border-gray-200 rounded-[10px] text-gray-500 mt-2 text-[16px] max-2xl:text-[15px] w-full py-2 px-3 leading-tight focus:outline-none focus:border-gray-500'
-                                                            name="selectedPoint" defaultValue={rating}>
+                                                            name="selectedPoint" defaultValue={rating} onChange={(e) => setRating(e.target.value)}>
                                                             <option value="1">1 point</option>
                                                             <option value="2">2 point</option>
                                                             <option value="3">3 point</option>
@@ -230,7 +222,7 @@ function CardReview({ id }) {
                                                         </label>
                                                         <select
                                                             className='bg-[#F4F4F4] border border-gray-200 text-gray-500 rounded-[10px] mt-2 text-[16px] max-2xl:text-[15px] w-full py-2 px-3 leading-tight focus:outline-none focus:border-gray-500'
-                                                            name="selectedGrade" defaultValue={grade}>
+                                                            name="selectedGrade" defaultValue={grade} onChange={(e) => setGrade(e.target.value)}>
                                                             <option value="A">A</option>
                                                             <option value="B+">B+</option>
                                                             <option value="B">B</option>
@@ -244,7 +236,7 @@ function CardReview({ id }) {
                                                 {/* footer */}
                                                 <div className="flex items-center p-4 md:p-5 rounded-b mt-[-20px] mb-2">
                                                     <button
-                                                        onClick={() => setIsModalEditOpen(false)}
+                                                        onClick={updateReview}
                                                         type="button"
                                                         className="text-white bg-gradient-to-br from-[#0D0B5F] to-[#029BE0] hover:from-[#029BE0] hover:to-[#0D0B5F] font-medium rounded-lg text-lg px-10 py-2 text-center w-full"
                                                     >
@@ -314,7 +306,7 @@ function CardReview({ id }) {
                                                     </div>
                                                     <div className="flex items-center pr-6 rounded-b mt-[-20px] mb-2 w-full">
                                                         <button
-                                                            onClick={() => setIsModalDeleteOpen(false)}
+                                                            onClick={deleteReview}
                                                             type="button"
                                                             className="text-white bg-gradient-to-br from-[#0D0B5F] to-[#029BE0] hover:from-[#029BE0] hover:to-[#0D0B5F] font-medium rounded-lg text-lg px-10 py-2 text-center w-full"
                                                         >
