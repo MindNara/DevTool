@@ -4,6 +4,8 @@ import Logo from '../../assets/Logo.png'
 import './SideNavBarStyle.css'
 import { SidebarHowToRegister } from '../../components/index'
 import { Button } from '@material-tailwind/react'
+import { auth } from '../../config/firebase'; // ต้องแก้ตาม path ของไฟล์ firebase.js หรือตามที่คุณตั้งชื่อไฟล์ไว้
+import { signOut } from "firebase/auth"; // Import signOut function from Firebase authentication
 
 function SideNavBar({ toggle, isOpen, setIsOpen }) {
     const location = useLocation();
@@ -12,6 +14,16 @@ function SideNavBar({ toggle, isOpen, setIsOpen }) {
     useEffect(() => {
         localStorage.setItem('isOpen', isOpen);
     }, [isOpen]);
+
+    // Function to handle user logout
+    const handleLogout = async () => {
+        try {
+            await signOut(auth); // Sign out the current user
+            navigate('/signIn'); // Navigate to the sign-in page after successful logout
+        } catch (error) {
+            console.error("Logout error:", error.message);
+        }
+    };
 
     return (
         <div className='fixed h-screen p-2'>
@@ -68,7 +80,7 @@ function SideNavBar({ toggle, isOpen, setIsOpen }) {
                                 <div className='bg-white w-12 max-2xl:w-9 h-12 max-2xl:h-9 rounded-[50px]'></div>
                                 <span className='username text-[18px] max-2xl:text-[14px] font-light'>Username</span>
                             </div>
-                            <Button onClick={() => { }}>
+                            <Button onClick={handleLogout}>
                                 <img className='max-2xl:w-5' width='24' height='24' src="https://img.icons8.com/ios-filled/FFFFFF/logout-rounded.png" alt="logout-rounded" />
                             </Button>
                         </div>
