@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
-import { Menu, MenuHandler, MenuItem, MenuList, rating } from "@material-tailwind/react";
-import { ReviewDetail } from "../../dummyData/ReviewDetail";
-import { collection, query, where, getDocs, doc, deleteDoc, updateDoc} from "firebase/firestore";
-import { db } from '../../config/firebase';
+import { Menu, MenuHandler, MenuItem, MenuList } from "@material-tailwind/react";
+import { collection, query, where, getDocs, doc, deleteDoc, updateDoc, arrayUnion, getDoc, arrayRemove, onSnapshot } from "firebase/firestore";
+import { db, auth } from '../../config/firebase';
+import {
+    Grade1,
+    Grade2,
+    Grade3,
+    Grade4,
+    Grade5,
+    Grade6,
+    Grade7
+} from '../../assets/picGrade/index';
 
 function CardReview({ id }) {
-    const user = "Anonymous1";
-    
+
     const [textReview, setTextReview] = useState('');
     const [rating, setRating] = useState('');
     const [grade, setGrade] = useState('');
+    const [amountLike, setAmountLike] = useState('');
+    const [amountDisLike, setAmountDisLike] = useState('');
 
     const [reviewDoc, setReviewDoc] = useState();
+    const user = (auth.currentUser);
 
 
     // แสดงผลดาวตรง rating
@@ -33,41 +43,59 @@ function CardReview({ id }) {
 
     // ดึงรีวิวในวิชานัั้นๆมา
     const [reviews, setReviews] = useState([]);
+    const getReview = () => {
+        const ReviewQuery = query(collection(db, "review"));
+
+        const unsubscribe = onSnapshot(ReviewQuery, (snapshot) => {
+            const reviewData = [];
+            snapshot.forEach((doc) => {
+                reviewData.push({ ...doc.data(), key: doc.id });
+            });
+            console.log(reviewData);
+            setReviews(reviewData);
+        }, (error) => {
+            console.error("Error fetching Review:", error);
+        });
+        // คืนค่าฟังก์ชัน unsubscribe เพื่อที่เราจะเรียกเมื่อต้องการหยุดฟังค้นหา
+        return unsubscribe;
+    }
+
     useEffect(() => {
-        const getReview = async () => {
-            try {
-                const querySnapshot = await getDocs(query(collection(db, "review"), where("subject_id", "==", id)));
-                console.log("Total review: ", querySnapshot.size);
-                const reviewDoc = [];
-                querySnapshot.forEach((doc) => {
-                    reviewDoc.push({ ...doc.data(), key: doc.id });
-                });
-                console.log(reviewDoc);
-                setReviews(reviewDoc);
-            } catch (error) {
-                console.error("Error fetching review:", error);
-            }
-        };
-        getReview();
-    }, []); // ต้องใส่ dependency array เป็น [] เพื่อให้ useEffect ทำงานเมื่อ component ถูกโหลดเท่านั้น
+        const unsubscribe = getReview();
+        return unsubscribe;  // จะเรียกเมื่อ component ถูก unmount
+    }, []);
+
+
+    const convertTimestampToTime = (timestamp) => {
+        // Convert Firestore Timestamp to JavaScript Date object
+        const date = timestamp.toDate();
+
+        // Format the date and time
+        const options = { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+        const formattedTime = date.toLocaleString('en-US', options); // สามารถเปลี่ยน 'th-TH' เป็นสำหรับภาษาและพื้นที่ที่ต้องการได้
+
+        return formattedTime;
+    };
 
 
     // แก้ไข review
     const updateReview = async () => {
-        console.log(reviewDoc);
+        // console.log(reviewDoc);
+        // console.log(user.uid);
+        const timestamp = new Date();
         const documentRef = doc(db, 'review', reviewDoc);
         try {
             await updateDoc(documentRef, {
                 detail: textReview,
                 rating: rating,
                 grade: grade,
+                time_stamp: timestamp
             });
             console.log("Data updated in Firestore!");
         } catch (error) {
             console.error("Error updating data in Firestore: ", error);
         }
         setIsModalEditOpen(false)
-        window.location.reload()
     }
 
     // ลบ Review
@@ -82,7 +110,6 @@ function CardReview({ id }) {
         }
         setReviewDoc("");
         setIsModalDeleteOpen(false)
-        window.location.reload()
     }
 
     // Modal edit open
@@ -105,8 +132,78 @@ function CardReview({ id }) {
     const toggleModalDelete = (ReviewId) => {
         setIsModalDeleteOpen(!isModalDeleteOpen);
         setReviewDoc(ReviewId);
-        
+
     };
+
+    const likeReview = async (reviewId) => {
+        const documentRef = doc(db, 'review', reviewId);
+        try {
+            const docSnapshot = await getDoc(documentRef);
+            if (docSnapshot.exists()) {
+                const reviewData = docSnapshot.data();
+                const likeArray = reviewData.like;
+                const dislikeArray = reviewData.dislike;
+                if (likeArray.includes(user.uid)) {
+                    // ถ้า user.uid อยู่ในอาร์เรย์ like ให้ลบ user.uid ออกจากอาร์เรย์
+                    await updateDoc(documentRef, {
+                        like: arrayRemove(user.uid)
+                    });
+                    console.log("User uid removed from like array in Firestore!");
+                } else if (dislikeArray.includes(user.uid)) {
+                    // ถ้า user.uid อยู่ในอาร์เรย์ dislike ให้เพิ่ม user.uid เข้าไปในอาร์เรย์
+                    await updateDoc(documentRef, {
+                        like: arrayUnion(user.uid)
+                    });
+                    await updateDoc(documentRef, {
+                        dislike: arrayRemove(user.uid)
+                    });
+                    console.log("User uid added to like array in Firestore!");
+                } else {
+                    await updateDoc(documentRef, {
+                        like: arrayUnion(user.uid)
+                    });
+                    console.log("User uid added to like array in Firestore!");
+                }
+            }
+        } catch (error) {
+            console.error("Error updating like in Firestore: ", error);
+        }
+    }
+
+    const disLikeReview = async (reviewId) => {
+        const documentRef = doc(db, 'review', reviewId);
+        try {
+            const docSnapshot = await getDoc(documentRef);
+            if (docSnapshot.exists()) {
+                const reviewData = docSnapshot.data();
+                const likeArray = reviewData.like;
+                const dislikeArray = reviewData.dislike;
+                if (dislikeArray.includes(user.uid)) {
+                    // ถ้า user.uid อยู่ในอาร์เรย์ like ให้ลบ user.uid ออกจากอาร์เรย์
+                    await updateDoc(documentRef, {
+                        dislike: arrayRemove(user.uid)
+                    });
+                    console.log("User uid removed from like array in Firestore!");
+                } else if (likeArray.includes(user.uid)) {
+                    // ถ้า user.uid อยู่ในอาร์เรย์ dislike ให้เพิ่ม user.uid เข้าไปในอาร์เรย์
+                    await updateDoc(documentRef, {
+                        dislike: arrayUnion(user.uid)
+                    });
+                    await updateDoc(documentRef, {
+                        like: arrayRemove(user.uid)
+                    });
+                    console.log("User uid added to like array in Firestore!");
+                } else {
+                    await updateDoc(documentRef, {
+                        dislike: arrayUnion(user.uid)
+                    });
+                    console.log("User uid added to like array in Firestore!");
+                }
+            }
+        } catch (error) {
+            console.error("Error updating like in Firestore: ", error);
+        }
+    }
 
     return (
         <div className="mt-4">
@@ -115,39 +212,39 @@ function CardReview({ id }) {
                     <div className="max-w p-6 bg-white border border-gray-200 rounded-xl mt-4">
                         <div className="mt-2 flex flex-row">
                             <div className="w-[50px] h-[50px] flex-shrink-0 rounded-full bg-[#151C38]"></div>
-                            {review.user_id == "ftAatjPLXHMPDnsvw0WQvGzYQpk2" && 
-                            (<Menu placement="bottom-end">
-                                <MenuHandler>
-                                    <div className="absolute right-20 cursor-pointer">
-                                        <Icon icon="prime:ellipsis-h" color="#151c38" width="19" height="19" />
-                                    </div>
-                                </MenuHandler>
-                                <MenuList className="bg-[#ffffff] border border-gray-200 shadow-md rounded-xl text-sm">
-                                    <MenuItem className="hover:bg-gray-200 cursor-pointer rounded-xl" onClick={() => toggleModalEdit(review)} >
-                                        <div className="flex item-center py-3">
-                                            <Icon
-                                                icon="fluent:edit-24-regular"
-                                                color="#727272"
-                                                width="15"
-                                                height="15"
-                                            />
-                                            <span className="pl-3 text-gray-700">Edit Review</span>
+                            {review.user_id == user.uid &&
+                                (<Menu placement="bottom-end">
+                                    <MenuHandler>
+                                        <div className="absolute right-20 cursor-pointer">
+                                            <Icon icon="prime:ellipsis-h" color="#151c38" width="19" height="19" />
                                         </div>
-                                    </MenuItem>
-                                    <MenuItem className="hover:bg-gray-200 cursor-pointer rounded-xl" onClick={() => toggleModalDelete(review.key)}>
-                                        <div className="hover:bg-gray-200 cursor-pointer">
+                                    </MenuHandler>
+                                    <MenuList className="bg-[#ffffff] border border-gray-200 shadow-md rounded-xl text-sm">
+                                        <MenuItem className="hover:bg-gray-200 cursor-pointer rounded-xl" onClick={() => toggleModalEdit(review)} >
                                             <div className="flex item-center py-3">
                                                 <Icon
-                                                    icon="mingcute:delete-3-line"
+                                                    icon="fluent:edit-24-regular"
                                                     color="#727272"
                                                     width="15"
                                                     height="15"
                                                 />
-                                                <p className="pl-3 text-gray-700">Delete Review</p>
-                                            </div></div>
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>)}
+                                                <span className="pl-3 text-gray-700">Edit Review</span>
+                                            </div>
+                                        </MenuItem>
+                                        <MenuItem className="hover:bg-gray-200 cursor-pointer rounded-xl" onClick={() => toggleModalDelete(review.key)}>
+                                            <div className="hover:bg-gray-200 cursor-pointer">
+                                                <div className="flex item-center py-3">
+                                                    <Icon
+                                                        icon="mingcute:delete-3-line"
+                                                        color="#727272"
+                                                        width="15"
+                                                        height="15"
+                                                    />
+                                                    <p className="pl-3 text-gray-700">Delete Review</p>
+                                                </div></div>
+                                        </MenuItem>
+                                    </MenuList>
+                                </Menu>)}
 
 
                             {/* Modal edit Review */}
@@ -323,8 +420,7 @@ function CardReview({ id }) {
                             <div className="ml-4">
                                 <p className="text-[#151C38] text-l font-[400]">Anonymous</p>
                                 <p className="text-[#A4A4A4] text-l font-[350]">
-                                    {/* {review.time_stamp} */}
-                                    13/2/2024, 3.00 PM
+                                    {convertTimestampToTime(review.time_stamp)}
                                 </p>
                             </div>
                         </div>
@@ -333,19 +429,19 @@ function CardReview({ id }) {
                             <DisplayRating rate={review.rating} />
                             <p className="font-medium text-[#A4A4A4] ml-2">Grade</p>
                             {review.grade === "A" ? (
-                                <img className="ml-2 w-[24px] h-[24px]" src="https://cdn.discordapp.com/attachments/867056877895286806/1200823655245037688/image.png?ex=65c7952d&is=65b5202d&hm=35e0b93485f56dd7b08fa524534769d48f753802b33ec8d33beebd2487af60d1&"></img>
+                                <img className="ml-2 w-[24px] h-[24px]" src={Grade1}></img>
                             ) : review.grade === "B+" ? (
-                                <img className="ml-2 w-[24px] h-[24px]" src="https://cdn.discordapp.com/attachments/867056877895286806/1200826488577077348/image.png?ex=65c797d1&is=65b522d1&hm=6047d554bd1ae7fb42a67e17d47d18d6949cba80d476e9befea31e1e0a7d01ab&"></img>
+                                <img className="ml-2 w-[24px] h-[24px]" src={Grade2}></img>
                             ) : review.grade === "B" ? (
-                                <img className="ml-2 w-[24px] h-[24px]" src="https://cdn.discordapp.com/attachments/867056877895286806/1200826543350480956/image.png?ex=65c797de&is=65b522de&hm=fc793844e178ab3239e2803e3f321f25947a9700d20681a67f9b358566a8be87&"></img>
+                                <img className="ml-2 w-[24px] h-[24px]" src={Grade3}></img>
                             ) : review.grade === "C+" ? (
-                                <img className="ml-2 w-[24px] h-[24px]" src="https://cdn.discordapp.com/attachments/867056877895286806/1200826586904154244/image.png?ex=65c797e8&is=65b522e8&hm=60bbe4f282d3daaa544216407d7bb82eb6ccff3e1a8356d52455609f7f05713a&"></img>
+                                <img className="ml-2 w-[24px] h-[24px]" src={Grade4}></img>
                             ) : review.grade === "C" ? (
-                                <img className="ml-2 w-[24px] h-[24px]" src="https://cdn.discordapp.com/attachments/867056877895286806/1200826642122145832/image.png?ex=65c797f5&is=65b522f5&hm=ae2abd1142ef97a395ae67f4b0a3f89038d874b20f64bafcda2460fdb6eb3245&"></img>
+                                <img className="ml-2 w-[24px] h-[24px]" src={Grade5}></img>
                             ) : review.grade === "D+" ? (
-                                <img className="ml-2 w-[24px] h-[24px]" src="https://cdn.discordapp.com/attachments/867056877895286806/1200826690713161881/image.png?ex=65c79801&is=65b52301&hm=237aa858af6385f223756aeb0126aee91c249af44679440622b1e0b7a89cee33&"></img>
+                                <img className="ml-2 w-[24px] h-[24px]" src={Grade6}></img>
                             ) : (
-                                <img className="ml-2 w-[24px] h-[24px]" src="https://cdn.discordapp.com/attachments/867056877895286806/1200826726968733808/image.png?ex=65c79809&is=65b52309&hm=6494ecd7d9feb8560ba209a7d09dfbff1eb7a48fed6273946f9a5867885bc2b1&"></img>
+                                <img className="ml-2 w-[24px] h-[24px]" src={Grade7}></img>
                             )}
 
                         </div>
@@ -353,9 +449,23 @@ function CardReview({ id }) {
                             <p className="text-[#151C38] font-normal">{review.detail}</p>
                         </div>
                         <div className="flex flex-row mt-2">
-                            <img className="w-[28px] h-[28px]" src="https://img.icons8.com/sf-regular-filled/48/cd0404/facebook-like.png" alt="" />
+                            <button name="like" className="rotate-0" onClick={() => { likeReview(review.key) }}>
+                                <Icon
+                                    icon="streamline:like-1-solid"
+                                    color="#9A1B29"
+                                    width="22"
+                                    height="22"
+                                />
+                            </button>
                             <p className="ml-2 text-[#151C38]">{review.like.length}</p>
-                            <img className="ml-2 w-[24px] h-[24px] mt-1" src="https://img.icons8.com/external-tanah-basah-detailed-outline-tanah-basah/48/cd0404/external-dislike-user-interface-tanah-basah-detailed-outline-tanah-basah.png" alt="" />
+                            <button name="dislike" className="rotate-180 mt-1 ml-2" onClick={() => { disLikeReview(review.key)}}>
+                                <Icon
+                                    icon="streamline:like-1"
+                                    color="#9A1B29"
+                                    width="22"
+                                    height="22"
+                                />
+                            </button>
                             <p className="ml-2 text-[#151C38]">{review.dislike.length}</p>
                         </div>
                     </div>

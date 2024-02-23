@@ -6,28 +6,8 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from '../config/firebase';
 
 function Review() {
-  // const [subject, setSubject] = useState([]);
-  // const getSubject = async () => {
-  //   try {
-  //     const querySnapshot = await getDocs(query(collection(db, "course"), where("type", "==", "วิชาบังคับ")));
-  //     console.log("Total subject: ", querySnapshot.size);
-  //     const subjectDoc = [];
-  //     querySnapshot.forEach((doc) => {
-  //       subjectDoc.push({ ...doc.data(), key: doc.id });
-  //     });
-  //     console.log(subjectDoc);
-  //     setSubject(subjectDoc);
-  //   } catch (error) {
-  //     console.error("Error fetching course:", error);
-  //   }
-  // }
-  // useEffect(() => {
-  //   getSubject();
-  //   // const unsubscribe = getSubject();
-  //   // return unsubscribe;  // จะเรียกเมื่อ component ถูก unmount
-  // }, []);
+  
   const [subjects, setSubjects] = useState([]);
-
   useEffect(() => {
     const getSubject = async () => {
       try {

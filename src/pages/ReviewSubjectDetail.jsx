@@ -3,7 +3,7 @@ import CardDetailSubject from '../components/cardReview/CardDetailSubject'
 import CardReview from '../components/cardReview/CardReview'
 import { Outlet, useLocation, Link, useParams } from 'react-router-dom'
 import { collection, query, where, getDocs,addDoc } from "firebase/firestore";
-import { db } from '../config/firebase';
+import { db, auth } from '../config/firebase';
 
 function ReviewSubjectDetail() {
   let { reviewId } = useParams();
@@ -17,6 +17,7 @@ function ReviewSubjectDetail() {
   // Modal create open
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
   const [subjects, setSubjects] = useState([]);
+  const user = auth.currentUser;
 
   const toggleModalCreate = () => {
     setIsModalCreateOpen(!isModalCreateOpen);
@@ -53,11 +54,9 @@ function ReviewSubjectDetail() {
         like: [],
         dislike: [],
         time_stamp: timestamp,
-        user_id: "ftAatjPLXHMPDnsvw0WQvGzYQpk2"
+        user_id: user.uid
       });
       setIsModalCreateOpen(false)
-      // getSubject()
-      window.location.reload()
       console.log("Add Review success");
       console.log("id " + reviewId)
     } catch (error) {
