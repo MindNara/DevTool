@@ -8,8 +8,27 @@ const AddNewPost = () => {
     setModalVisible(!modalVisible);
   };
 
-  const handlePost = () => {
+  const handlePost = async() => {
     // ทำงานที่ต้องการเมื่อผู้ใช้กด Accept
+    const timestamp = new Date();
+    console.log(timestamp)
+    // try {
+    //   const ReviewRef = await addDoc(collection(db, "review"), {
+    //     detail: reviewDetail,
+    //     grade: reviewGrade,
+    //     rating: reviewRating,
+    //     subject_id: reviewId,
+    //     like: [],
+    //     dislike: [],
+    //     time_stamp: timestamp,
+    //     user_id: user.uid
+    //   });
+    //   setIsModalCreateOpen(false)
+    //   console.log("Add Review success");
+    //   console.log("id " + reviewId)
+    // } catch (error) {
+    //   console.log(error);
+    // }
     setModalVisible(false); // ปิด Modal
   };
 
