@@ -18,8 +18,8 @@ function CardReview({ id }) {
     const [textReview, setTextReview] = useState('');
     const [rating, setRating] = useState('');
     const [grade, setGrade] = useState('');
-    const [amountLike, setAmountLike] = useState('');
-    const [amountDisLike, setAmountDisLike] = useState('');
+    const [statusLikeReview, setStatusLikeReview] = useState('');
+    const [statusDisLikeReview, setStatusDisLikeReview] = useState('');
 
     const [reviewDoc, setReviewDoc] = useState();
     const user = (auth.currentUser);
@@ -64,6 +64,19 @@ function CardReview({ id }) {
         const unsubscribe = getReview();
         return unsubscribe;  // จะเรียกเมื่อ component ถูก unmount
     }, []);
+
+    useEffect(() => {
+        const filterStatusLike = {};
+        const filterStatusDisLike = {};
+        reviews.forEach(reviewDetail => {
+          //ถ้า Review ไหนมี userCurrent 'กดหัวใจ' จะมีค่าเป็น true
+          //โดยจะเก็บ key ของ review นั้น มันคือค่า document ของ review แต่ละอันอะ และ boolean
+          filterStatusLike[reviewDetail.key] = reviewDetail.like.includes(user.uid);
+          filterStatusDisLike[reviewDetail.key] = reviewDetail.dislike.includes(user.uid);
+        });
+        setStatusLikeReview(filterStatusLike);
+        setStatusDisLikeReview(filterStatusDisLike);
+      }, [reviews]); //โดยดูการเปลี่ยนแปลงของ review
 
 
     const convertTimestampToTime = (timestamp) => {
@@ -451,7 +464,7 @@ function CardReview({ id }) {
                         <div className="flex flex-row mt-2">
                             <button name="like" className="rotate-0" onClick={() => { likeReview(review.key) }}>
                                 <Icon
-                                    icon="streamline:like-1-solid"
+                                    icon={statusLikeReview[review.key] ? "streamline:like-1-solid" : "streamline:like-1"}
                                     color="#9A1B29"
                                     width="22"
                                     height="22"
@@ -460,7 +473,7 @@ function CardReview({ id }) {
                             <p className="ml-2 text-[#151C38]">{review.like.length}</p>
                             <button name="dislike" className="rotate-180 mt-1 ml-2" onClick={() => { disLikeReview(review.key)}}>
                                 <Icon
-                                    icon="streamline:like-1"
+                                    icon={statusDisLikeReview[review.key] ? "streamline:like-1-solid" : "streamline:like-1"}
                                     color="#9A1B29"
                                     width="22"
                                     height="22"
