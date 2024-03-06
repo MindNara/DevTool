@@ -19,21 +19,16 @@ const AddNewPost = ({userId}) => {
 
   const handleImageUpload = async (file) => {
     // Reference to the storage service
-    console.log('-------- เข้ายัง -----------')
-    console.log('FILE__ ', file)
     const storage = getStorage();
   
     // Create a storage reference
     const storageRef = ref(storage, `images/${file.name}`);
-    console.log('___storageRef__ ', storageRef)
     
     // Upload file to the storage reference
     const snapshot = await uploadBytes(storageRef, file);
-    console.log('___snapshot__ ', snapshot)
   
     // Get the download URL
     const downloadURL = await getDownloadURL(snapshot.ref);
-    console.log('image URL ____ ', downloadURL)
   
     return downloadURL;
   };
@@ -52,7 +47,6 @@ const AddNewPost = ({userId}) => {
     
     console.log(timestamp)
     try {
-
       const PostRef = await addDoc(collection(db, "post"), {
         title: postTitle,
         detail: postDescription,
@@ -61,12 +55,14 @@ const AddNewPost = ({userId}) => {
         timestamp: timestamp,
         user_id: userId
       });
-      console.log("Add Post success: ", PostRef);
     } 
     
     catch (error) {
       console.log(error);
     }
+    setPostImages([])
+    setPostDescription('')
+    setPostTitle('')
     setModalVisible(false); // ปิด Modal
   };
 
@@ -168,7 +164,7 @@ const AddNewPost = ({userId}) => {
                     accept="image/*"
                     onChange={handleAddImage}
                     id="image-upload"
-                    className="flex items-center text-gray-900 bg-white border border-gray-400 focus:outline-none hover:border-[#0D0B5F] font-normal rounded-lg text-sm px-5 py-2 me-2 mb-2"
+                    className="hidden flex items-center text-gray-900 bg-white border border-gray-400 focus:outline-none hover:border-[#0D0B5F] font-normal rounded-lg text-sm px-5 py-2 me-2 mb-2"
                   />
                     <label
                         htmlFor="image-upload"

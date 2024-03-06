@@ -3,8 +3,20 @@ import React from "react";
 import { Icon } from "@iconify/react";
 
 const PopUpEdit = ({ handleClose, togglePopup, handlePost }) => {
+
+  const [postTitle, setPostTitle] = useState("")
+  const [postDescription, setPostDescription] = useState("");
+  const [postImages, setPostImages] = useState([])
+  
+  // fetch old data
+  useEffect(() => {
+
+  }, [])
+
+  // update data
+
   return (
-     <div
+    <div
           id="default-modal"
           tabIndex="-1"
           aria-hidden="true"
@@ -62,28 +74,39 @@ const PopUpEdit = ({ handleClose, togglePopup, handlePost }) => {
                     type="text"
                     placeholder="New Title"
                     className="border-none outline-none p-2  w-full focus:ring-0 text-xl font-semibold"
+                    value={postTitle}
+                    onChange={(input) => setPostTitle(input.target.value)}
                   />
                   <textarea
                     rows="4"
                     cols="50"
                     placeholder="Text to something ..."
                     className="border-none outline-none p-2 mb-4 w-full resize-none focus:ring-0 text-base font-normal"
+                    value={postDescription}
+                    onChange={(input) => setPostDescription(input.target.value)}
                   />
                 </div>
 
                 <div className="flex items-center p-4 md:p-5 rounded-b mt-[-20px]">
-                  <button
-                    type="button"
-                    className="flex items-center text-gray-900 bg-white border border-gray-400 focus:outline-none hover:border-[#0D0B5F] font-normal rounded-lg text-sm px-5 py-2 me-2 mb-2"
-                  >
-                    Add image
-                    <Icon
-                      icon="ion:image-outline"
-                      className="ms-2"
-                      width="20"
-                      height="20"
-                    />
-                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAddImage}
+                    id="image-upload"
+                    className="hidden flex items-center text-gray-900 bg-white border border-gray-400 focus:outline-none hover:border-[#0D0B5F] font-normal rounded-lg text-sm px-5 py-2 me-2 mb-2"
+                  />
+                    <label
+                        htmlFor="image-upload"
+                        className="flex items-center text-gray-900 bg-white border border-gray-400 focus:outline-none hover:border-[#0D0B5F] font-normal rounded-lg text-sm px-5 py-2 me-2 mb-2 cursor-pointer"
+                    >
+                      Add image
+                      <Icon
+                        icon="ion:image-outline"
+                        className="ms-2"
+                        width="20"
+                        height="20"
+                      />
+                    </label>
                 </div>
 
                 <div className="flex items-center p-4 md:p-5 rounded-b mt-[-20px]">
