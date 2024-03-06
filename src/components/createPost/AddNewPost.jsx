@@ -1,34 +1,72 @@
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
+import { collection, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db } from '../../config/firebase';
 
-const AddNewPost = () => {
+
+const AddNewPost = ({userId}) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleModalToggle = () => {
     setModalVisible(!modalVisible);
   };
 
+  const [postTitle, setPostTitle] = useState("")
+  const [postDescription, setPostDescription] = useState("");
+  const [postImages, setPostImages] = useState([])
+
+
+  const handleImageUpload = async (file) => {
+    // Reference to the storage service
+    console.log('-------- เข้ายัง -----------')
+    console.log('FILE__ ', file)
+    const storage = getStorage();
+  
+    // Create a storage reference
+    const storageRef = ref(storage, `images/${file.name}`);
+    console.log('___storageRef__ ', storageRef)
+    
+    // Upload file to the storage reference
+    const snapshot = await uploadBytes(storageRef, file);
+    console.log('___snapshot__ ', snapshot)
+  
+    // Get the download URL
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    console.log('image URL ____ ', downloadURL)
+  
+    return downloadURL;
+  };
+
+  const handleAddImage = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const downloadURL = await handleImageUpload(file);
+      setPostImages([...postImages, downloadURL]);
+    }
+  };
+
   const handlePost = async() => {
     // ทำงานที่ต้องการเมื่อผู้ใช้กด Accept
     const timestamp = new Date();
+    
     console.log(timestamp)
-    // try {
-    //   const ReviewRef = await addDoc(collection(db, "review"), {
-    //     detail: reviewDetail,
-    //     grade: reviewGrade,
-    //     rating: reviewRating,
-    //     subject_id: reviewId,
-    //     like: [],
-    //     dislike: [],
-    //     time_stamp: timestamp,
-    //     user_id: user.uid
-    //   });
-    //   setIsModalCreateOpen(false)
-    //   console.log("Add Review success");
-    //   console.log("id " + reviewId)
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+
+      const PostRef = await addDoc(collection(db, "post"), {
+        title: postTitle,
+        detail: postDescription,
+        image: postImages,
+        like: [],
+        timestamp: timestamp,
+        user_id: userId
+      });
+      console.log("Add Post success: ", PostRef);
+    } 
+    
+    catch (error) {
+      console.log(error);
+    }
     setModalVisible(false); // ปิด Modal
   };
 
@@ -111,28 +149,39 @@ const AddNewPost = () => {
                     type="text"
                     placeholder="New Title"
                     className="border-none outline-none p-2  w-full focus:ring-0 text-xl font-semibold"
+                    value={postTitle}
+                    onChange={(e) => setPostTitle(e.target.value)}
                   />
                   <textarea
                     rows="4"
                     cols="50"
                     placeholder="Text to something ..."
                     className="border-none outline-none p-2 mb-4 w-full resize-none focus:ring-0 text-base font-normal"
+                    value={postDescription}
+                    onChange={(e) => setPostDescription(e.target.value)}
                   />
                 </div>
 
                 <div className="flex items-center p-4 md:p-5 rounded-b mt-[-20px]">
-                  <button
-                    type="button"
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAddImage}
+                    id="image-upload"
                     className="flex items-center text-gray-900 bg-white border border-gray-400 focus:outline-none hover:border-[#0D0B5F] font-normal rounded-lg text-sm px-5 py-2 me-2 mb-2"
-                  >
-                    Add image
-                    <Icon
-                      icon="ion:image-outline"
-                      className="ms-2"
-                      width="20"
-                      height="20"
-                    />
-                  </button>
+                  />
+                    <label
+                        htmlFor="image-upload"
+                        className="flex items-center text-gray-900 bg-white border border-gray-400 focus:outline-none hover:border-[#0D0B5F] font-normal rounded-lg text-sm px-5 py-2 me-2 mb-2 cursor-pointer"
+                    >
+                      Add image
+                      <Icon
+                        icon="ion:image-outline"
+                        className="ms-2"
+                        width="20"
+                        height="20"
+                      />
+                    </label>
                 </div>
 
                 <div className="flex items-center p-4 md:p-5 rounded-b mt-[-20px]">

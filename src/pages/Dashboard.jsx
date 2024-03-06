@@ -39,7 +39,7 @@ function Dashboard() {
       </header>
       <div className='w-full h-auto flex mt-5'>
         <div className='w-[70%] mr-10'>
-          {userData.role == 'admin' && <AddNewPost />}
+          {userData.role == 'admin' && <AddNewPost userId={userData.userId} />}
           <PostDetailCard userId={userData.userId} role={userData.role} />
         </div>
         <div className='w-[30%] border-l-[1px] border-[#00000052] pl-10'>
