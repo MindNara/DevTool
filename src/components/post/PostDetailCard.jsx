@@ -95,7 +95,7 @@ const PostDetailCard = ({ userId, role }) => {
 
   const handlePrevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + DetailCard.length) % detailCard.length
+      (prevIndex) => (prevIndex - 1 + detailCard.length) % detailCard.length
     );
   };
 
@@ -149,6 +149,12 @@ const PostDetailCard = ({ userId, role }) => {
       const downloadURL = await handleImageUpload(file);
       setPostImages([...postImages, downloadURL]);
     }
+  };
+
+  const handleDeleteImage = (imageIndex) => {
+    const updatedImages = [...postImages];
+    updatedImages.splice(imageIndex, 1);
+    setPostImages(updatedImages);
   };
 
   const toggleModalEditSave = async () => {
@@ -308,8 +314,21 @@ const PostDetailCard = ({ userId, role }) => {
                           />
                         </label>
                       </div>
+
+                      <div className="grid grid-cols-4 gap-1 content-center justify-items-center">
+                        {postImages.length !== 0 &&
+                          postImages.map((image, index) => (
+                            <div key={index} className="bg-gray border rounded">
+                              <img className="object-scale-down h-20 w-20" src={image} alt="uploaded" />
+                              <button className="top-0 right-0 h-1 w-full" onClick={() => handleDeleteImage(index)}>
+                                <span className="text-red-400 text-sm">Delete</span>
+                              </button>
+                            </div>
+                          ))
+                        }
+                      </div>
                       {/* footer */}
-                      <div className="flex items-center p-4 md:p-5 rounded-b mt-[-20px] mb-2">
+                      <div className="flex items-center p-4 md:p-5 rounded-b mt-[20px] mb-2">
                         <button
                           onClick={() => toggleModalEditSave(postId)}
                           type="button"

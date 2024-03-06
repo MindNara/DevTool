@@ -68,14 +68,18 @@ const CommentBox = ({ userId, postId, role }) => {
 
   // ลบ Comment
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [deletedCommentId, setdeletedCommentId] = useState("")
+
   const toggleModalDelete = async (command, commentId) => {
+
     if (command === 'X' || command === 'cancle') {
       setIsModalDeleteOpen(false);
     } else if (command === 'openModal') {
+      setdeletedCommentId(commentId)
       setIsModalDeleteOpen(true);
     } else if (command === 'delete') {
       try {
-        await deleteDoc(doc(db, "comment", commentId));
+        await deleteDoc(doc(db, "comment", deletedCommentId));
         console.log("Comment deleted successfully!");
       } catch (error) {
         console.error("Error deleting comment:", error);
@@ -115,7 +119,7 @@ const CommentBox = ({ userId, postId, role }) => {
                           <span className="pl-3 text-gray-700">Edit Comment</span>
                         </div>
                       </MenuItem>
-                      <MenuItem className="hover:bg-gray-200 cursor-pointer rounded-xl" onClick={() => toggleModalDelete('openModal', comment.commentId)}>
+                      <MenuItem className="hover:bg-gray-200 cursor-pointer rounded-xl" onClick={() => toggleModalDelete('openModal', comment.id)}>
                         <div className="hover:bg-gray-200 cursor-pointer">
                           <div className="flex item-center py-3">
                             <Icon
@@ -235,7 +239,7 @@ const CommentBox = ({ userId, postId, role }) => {
                       {/* body */}
                       <div className="flex flex-col p-4 md:p-5 justify-center items-center text-2xl font-normal">
                         <p>Are you sure you want to</p>
-                        <p>delete your "{comment.message}" ?</p>
+                        <p>delete your comment ?</p>
                       </div>
                       {/* footer */}
                       <div className="flex flex-row gap-4 mb-2 mt-6">
@@ -245,12 +249,12 @@ const CommentBox = ({ userId, postId, role }) => {
                             type="button"
                             className="text-gray-500 bg-white hover:from-[#029BE0] hover:to-[#0D0B5F] font-medium rounded-lg text-lg px-10 py-2 text-center w-full border-2 border-[#D9D9D9]"
                           >
-                            Cancle
+                            Canc
                           </button>
                         </div>
                         <div className="flex items-center pr-6 rounded-b mt-[-20px] mb-2 w-full">
                           <button
-                            onClick={() => toggleModalDelete('delete', comment.id)}
+                            onClick={() => toggleModalDelete('delete')}
                             type="button"
                             className="text-white bg-gradient-to-br from-[#0D0B5F] to-[#029BE0] hover:from-[#029BE0] hover:to-[#0D0B5F] font-medium rounded-lg text-lg px-10 py-2 text-center w-full"
                           >
