@@ -417,7 +417,7 @@ const PostDetailCard = ({ userId, role }) => {
               <div className="w-[50px] h-[50px] flex-shrink-0 rounded-full bg-[#151C38]"></div>
               <div className="ml-4">
                 <p className="text-[#151C38] text-l font-[400]">
-                  {detail.user_id}
+                  Admin
                 </p>
                 <p className="text-[#A4A4A4] text-l font-[350]">
                   {convertTimestampToTime(detail.timestamp)}

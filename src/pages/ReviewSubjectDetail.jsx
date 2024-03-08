@@ -13,7 +13,7 @@ function ReviewSubjectDetail() {
 
   const [reviewDetail, setReviewDetail] = useState("");
   const [reviewGrade, setReviewGrade] = useState("A");
-  const [reviewRating, setReviewRating] = useState("1");
+  const [reviewRating, setReviewRating] = useState("5");
   // Modal create open
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
   const [subjects, setSubjects] = useState([]);
