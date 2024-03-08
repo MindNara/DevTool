@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import {
   Homepage,
   Dashboard,
   Review,
-  StudyPlan,
   HowToRegister,
   SignIn,
   SignUp,
@@ -11,12 +11,23 @@ import {
   ReviewSubjectDetail,
   ReviewLayout,
 } from './pages/index';
-import {
-  StudyPlanForm,
-  StudyPlanTable,
-} from './components/index'
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './config/firebase';
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const ProtectedRoute = ({ element, path }) => {
+    return user ? element : <Navigate to="/signin" />;
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -24,17 +35,13 @@ function App() {
         <Route path='/signin' element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />}></Route>
-          <Route path="review" element={<ReviewLayout />} >
+          <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+          <Route path="review" element={<ProtectedRoute element={<ReviewLayout />} />}>
             <Route index element={<Review />} />
             <Route path=":reviewId" element={<ReviewSubjectDetail />} />
           </Route>
-          <Route path="studyPlan" element={<StudyPlan />} >
-            <Route index element={<StudyPlanForm />} />
-            <Route path="result" element={<StudyPlanTable />} />
-          </Route>
         </Route>
-        <Route path="howToRegister" element={<HowToRegister />} />
+        <Route path="howToRegister" element={<ProtectedRoute element={<HowToRegister />} />} />
       </Routes>
     </BrowserRouter>
 
