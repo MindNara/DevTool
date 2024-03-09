@@ -6,8 +6,6 @@ COPY package.json /app
 
 RUN npm install
 
-COPY . .env ./
-
 COPY . /app
 
 EXPOSE 3000
