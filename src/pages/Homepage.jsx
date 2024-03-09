@@ -22,7 +22,7 @@ function Homepage() {
                 </ul>
             </div>
             <div className='h-full flex flex-col justify-center items-center'>
-                <h2 className='font-semibold text-[80px] max-2xl:text-[60px] tracking-[2px]'>HOW THREE</h2>
+                <h2 className='font-semibold text-[80px] max-2xl:text-[60px] tracking-[2px]'>HOW TO</h2>
                 <h1 className='font-bold text-[120px] max-2xl:text-[90px] tracking-[15px] mt-[-55px] max-2xl:mt-[-40px] textTitleGradient'
                 >
                     REGISTER</h1>
