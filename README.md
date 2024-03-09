@@ -4,7 +4,6 @@
 
 เทคโนโลยีที่ใช้พัฒนา: React.js, Node.js, Tailwind CSS, and Firebase
 
-
 ## How to use
 
 ### 1. Clone this Repository
