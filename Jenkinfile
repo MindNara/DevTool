@@ -11,9 +11,14 @@ pipeline {
         stage('Start Jenkins') {
             steps {
                 // Checkout your source code from version control
-             
-                    sh 'echo Start Jenkins............'
-                    sh 'echo docker : user = $DOCKER_CREDENTIALS_USR : password = $DOCKER_CREDENTIALS_PSW'
+                sh 'echo Start Jenkins............'
+                sh 'echo Contents of workspace:'
+                sh 'ls -la'
+                sh 'echo Contents of DevTool directory:'
+                sh 'ls -la DevTool'
+                sh 'cat .env'
+
+                sh 'echo docker : user = $DOCKER_CREDENTIALS_USR : password = $DOCKER_CREDENTIALS_PSW'
             }
         }
         
