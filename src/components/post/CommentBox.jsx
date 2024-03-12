@@ -18,7 +18,7 @@ const CommentBox = ({ userId, postId, role }) => {
         subjectDocs.push({ ...doc.data(), id: doc.id });
       });
       // เรียงลำดับโพสต์ตามเวลาล่าสุด
-      subjectDocs.sort((a, b) => b.timestamp - a.timestamp);
+      // subjectDocs.sort((a, b) => b.timestamp - a.timestamp);
       console.log("Look comment >>> ", subjectDocs);
       setDetailCommentBox([...subjectDocs]);
     }, (error) => {
@@ -96,7 +96,8 @@ const CommentBox = ({ userId, postId, role }) => {
           <div className="ml-3 p-2 bg-[#E3F3FF] relative" style={{ width: '100%', maxWidth: 'calc(100% - 40px)', borderRadius: '10px' }}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center">
-                <p className="text-[#151C38] text-sm font-[400]">{comment.user_id}</p>
+                {/* <p className="text-[#151C38] text-sm font-[400]">{comment.user_id}</p> */}
+                <p className="text-[#151C38] text-sm font-[400]">{comment.user_id == "qaK3UESxESOfa2HWtTO1koATGku2" ? (<p>admin</p>) : (<p>Anonymous</p>)}</p>
                 <p className="text-[#A4A4A4] text-[10px] font-[350] ml-2 mt-[2px]">{convertTimestampToTime(comment.timestamp)}</p>
               </div>
               <div className="relative">
