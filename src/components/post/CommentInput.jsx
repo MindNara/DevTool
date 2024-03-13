@@ -6,11 +6,17 @@ import { db } from '../../config/firebase';
 function CommentInput({ userId, postId, role }) {
 
   const [commentDetail, setCommentDetail] = useState("")
+  const [isError, setIsError] = useState(false);
 
   // Create Comment
   const createComment = async () => {
     const timestamp = new Date();
     console.log(timestamp)
+    if (commentDetail.trim() === '') {
+      setIsError(true);
+      return;
+    }
+
     try {
       const CommentRef = await addDoc(collection(db, "comment"), {
         message: commentDetail,
@@ -20,6 +26,7 @@ function CommentInput({ userId, postId, role }) {
       });
       console.log("msg >> ", commentDetail)
       setCommentDetail("");
+      setIsError(false);
       console.log("msg >> ", commentDetail)
     } catch (error) {
       console.log(error);
@@ -30,7 +37,7 @@ function CommentInput({ userId, postId, role }) {
     <div name="post" className="relative mx-2">
       <input
         value={commentDetail}
-        className="w-full h-[40px] rounded-[10px] border-0 py-5 pl-7 pr-20 text-[16px] text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1.5 focus:ring-inset focus:ring-[#0D0B5F] text-sm font-light "
+        className={`w-full h-[40px] rounded-[10px] border-0 py-5 pl-7 pr-20 text-[16px] text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1.5 focus:ring-inset focus:ring-[#0D0B5F] text-sm font-light ${isError ? 'ring-red-500' : ''}`}
         placeholder="Your Message ..."
         onChange={(e) => setCommentDetail(e.target.value)}
       ></input>
