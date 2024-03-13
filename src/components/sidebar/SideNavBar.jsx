@@ -25,6 +25,7 @@ function SideNavBar({ toggle, isOpen, setIsOpen }) {
         }
     };
 
+
     return (
         <div className='fixed h-screen p-2'>
             <div className={`sidebar ${isOpen ? '' : 'active'} max-2xl:w-[240px] bg-[#181754] h-full rounded-[30px] text-white py-10 max-2xl:py-8 flex flex-col justify-between`}>
@@ -38,10 +39,10 @@ function SideNavBar({ toggle, isOpen, setIsOpen }) {
                     </button>
                 </div>
                 <ul className='pl-5'>
-                    <li className={location.pathname === '/dashboard' && 'active'}>
-                        <Link to='/dashboard'>
-                            <img src={`https://img.icons8.com/fluency-systems-filled/${location.pathname === '/dashboard' ? '181754' : 'FFFFFF'}/home.png`} alt="home" />
-                            <span>Dashboard</span>
+                    <li className={location.pathname === '/announcement' && 'active'}>
+                        <Link to='/announcement'>
+                            <img src={`https://img.icons8.com/fluency-systems-filled/${location.pathname === '/announcement' ? '181754' : 'FFFFFF'}/home.png`} alt="home" />
+                            <span>Announcement</span>
                         </Link>
                     </li>
                     <li className={location.pathname === '/review' || location.pathname.startsWith('/review/') ? 'active' : ''}>

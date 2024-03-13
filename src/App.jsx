@@ -35,7 +35,7 @@ function App() {
         <Route path='/signin' element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+          <Route path="/announcement" element={<ProtectedRoute element={<Dashboard />} />} />
           <Route path="review" element={<ProtectedRoute element={<ReviewLayout />} />}>
             <Route index element={<Review />} />
             <Route path=":reviewId" element={<ReviewSubjectDetail />} />

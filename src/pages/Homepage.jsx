@@ -30,7 +30,7 @@ function Homepage() {
                     <p className=''>There are several steps to help you get ready for your college experience</p>
                     <p className=''>here are some tips on how to register for college classes.</p>
                 </div>
-                <button onClick={() => navigate('dashboard')}
+                <button onClick={() => navigate('announcement')}
                     className='box-btnGradient text-[20px] max-2xl:text-[18px] text-[#0cb6ff] px-9 py-3 mt-20 max-2xl:mt-12'
                 >
                     Get Started

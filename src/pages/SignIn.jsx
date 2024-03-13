@@ -25,7 +25,7 @@ function SignIn() {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             console.log("User signed in successfully:", userCredential.user);
-            navigate('/dashboard');
+            navigate('/announcement');
         } catch (error) {
             alert("รหัสผิดผ่าน โปรดลองอีกครั้ง");
             // setError(error.message);
