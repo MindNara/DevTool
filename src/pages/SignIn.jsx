@@ -18,7 +18,7 @@ function SignIn() {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             console.log("User signed in successfully:", userCredential.user);
-            navigate('/dashboard');
+            navigate('/announcement');
         } catch (error) {
             setError(error.message);
             console.error("Signin error:", error.message);
