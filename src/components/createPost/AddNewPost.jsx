@@ -46,8 +46,19 @@ const AddNewPost = ({ userId }) => {
     setPostImages(updatedImages);
   }
 
+  const [titleError, setTitleError] = useState(false);
+  const [descriptionError, setDescriptionError] = useState(false);
+
+
   const handlePost = async (command) => {
-    if (command == 'post') {
+    if (command === 'post') {
+      // ตรวจสอบค่าว่างของ NewTitle และ Detail
+      if (postTitle.trim() === '' || postDescription.trim() === '') {
+        setTitleError(postTitle.trim() === '');
+        setDescriptionError(postDescription.trim() === '');
+        return; // ไม่ทำการ Post ถ้า NewTitle หรือ Detail ว่าง
+      }
+  
       // ทำงานที่ต้องการเมื่อผู้ใช้กด Accept
       const timestamp = new Date();
       try {
@@ -64,11 +75,16 @@ const AddNewPost = ({ userId }) => {
         console.log(error);
       }
     }
-    setPostImages([])
-    setPostDescription('')
-    setPostTitle('')
+    // Reset ค่า validation เมื่อผู้ใช้ปิด Modal หรือกด Post สำเร็จ
+    setTitleError(false);
+    setDescriptionError(false);
+    setPostImages([]);
+    setPostDescription('');
+    setPostTitle('');
     setModalVisible(false); // ปิด Modal
   };
+  
+
 
   return (
     <div className="flex-shrink-0 bg-white border-[2px] border-solid border-gray-300 rounded-[20px] p-4 relative">
@@ -148,19 +164,24 @@ const AddNewPost = ({ userId }) => {
                   <input
                     type="text"
                     placeholder="New Title"
-                    className="border-none outline-none p-2  w-full focus:ring-0 text-xl font-semibold"
+                    className={`border-none outline-none p-2 w-full focus:ring-0 text-xl font-semibold ${titleError ? 'border-red-500' : ''
+                      }`}
                     value={postTitle}
                     onChange={(e) => setPostTitle(e.target.value)}
                   />
+                  {titleError && <p className="text-red-500 ml-2 text-sm">Please enter a title</p>}
                   <textarea
                     rows="4"
                     cols="50"
                     placeholder="Text to something ..."
-                    className="border-none outline-none p-2 mb-4 w-full resize-none focus:ring-0 text-base font-normal"
+                    className={`border-none outline-none p-2 mb-4 w-full resize-none focus:ring-0 text-base font-normal ${descriptionError ? 'border-red-500' : ''
+                      }`}
                     value={postDescription}
                     onChange={(e) => setPostDescription(e.target.value)}
                   />
+                  {descriptionError && <p className="text-red-500 ml-2 text-sm">Please enter a message</p>}
                 </div>
+
 
                 <div className="flex items-center p-4 md:p-5 rounded-b mt-[-20px]">
                   <input
