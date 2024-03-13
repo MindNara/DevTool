@@ -25,6 +25,7 @@ function SideNavBar({ toggle, isOpen, setIsOpen }) {
         }
     };
 
+
     return (
         <div className='fixed h-screen p-2'>
             <div className={`sidebar ${isOpen ? '' : 'active'} max-2xl:w-[240px] bg-[#181754] h-full rounded-[30px] text-white py-10 max-2xl:py-8 flex flex-col justify-between`}>
